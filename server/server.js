@@ -1,80 +1,28 @@
-let mongoose = require("mongoose");
+let express = require("express");
+let bodyParser = require("body-parser");
 
-mongoose.Promise = global.Promise;
-mongoose.connect("mongodb://localhost:27017/TodoApp");
+const { mongoose } = require("./db/mongoose");
+let { User } = require("./models/user");
+let { Todo } = require("./models/todo");
 
-// let Todo = mongoose.model("Todo", {
-//   text: {
-//     type: String,
-//     required:true,
-//     trim:true,
-//     minlength:1
-//   },
-//   completed: {
-//     type: Boolean,
-//     default:false
-//   },
-//   completedAt: {
-//     type: Number,
-//     default:null
-//   },
+let app = express();
+app.use(bodyParser.json());
 
-// });
-
-// let newTodo = new Todo({
-//   text: "cook dinner"
-// });
-
-// newTodo.save().then(
-//   doc => {
-//     console.log("saved todo", doc);
-//   },
-//   err => {
-//     console.log("unable to save todo");
-//   }
-// );
-
-// assignment creating another document in todo collection
-// let Todo = mongoose.model("Todo", {
-//   text: {
-//     type: String
-//   },
-//   completed: {
-//     type: Boolean
-//   },
-//   completedAt: {
-//     type: Number
-//   }
-// });
-
-// const newTodo = new Todo({
-//   text: "I just did the assignment",
-//   completed: true,
-//   completedAt: 123
-// });
-// newTodo.save().then(
-//   doc => {
-//     return console.log(`todo saved : ${doc}`);
-//   },
-//   error => console.log("Unable to save newTodo", error)
-// );
-
-let User = mongoose.model("User", {
-  email: {
-    minlength: 1,
-    required: true,
-    trim: true,
-    type: String
-  }
+app.post("/todos", (req, res) => {
+  let todo = new Todo({
+    text: req.body.text
+  });
+  todo.save().then(
+    doc => {
+      res.send(doc);
+    },
+    err => {
+      res.status(400).send(err);
+    }
+  );
 });
 
-const newUser = new User({
-  email: "blessed"
+let PORT = 3000;
+app.listen(PORT, () => {
+  console.log(`listening on port ${PORT}`);
 });
-
-newUser.save().then(
-  doc => {
-    console.log(JSON.stringify(doc, undefined, 2));
-  },
-  err => console.log("unable to create user", err)
-);
